@@ -28,7 +28,9 @@ func (app *App) StartRouter() {
 
 	port := 8001
 	golog.Infof("Server started at port :%d", port)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port),
+	err := http.ListenAndServeTLS(fmt.Sprintf(":%d", port),
+		"/etc/letsencrypt/live/hahao.ru/fullchain.pem",
+		"/etc/letsencrypt/live/hahao.ru/privkey.pem",
 		nil)
 
 	if err != nil {
