@@ -12,5 +12,4 @@ EXPOSE 8001
 
 WORKDIR /opt/build/GOSecretProject/cmd/
 COPY --from=build /opt/build/GOSecretProject/cmd/ ./
-ADD
 CMD ./main
