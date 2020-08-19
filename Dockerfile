@@ -1,9 +1,15 @@
-FROM golang:alpine
+FROM golang AS build
 
-COPY . /app
+ADD ./ /opt/build/GOSecretProject/
+WORKDIR /opt/build/GOSecretProject/cmd
+RUN go build main.go
 
-WORKDIR /app
+FROM ubuntu:18.04 AS release
 
-RUN apk add make && make build-app
+EXPOSE 5432
 
-CMD ["/app/app"]
+EXPOSE 8001
+
+WORKDIR /opt/build/GOSecretProject/cmd/
+COPY --from=build /opt/build/GOSecretProject/cmd/ ./
+CMD ./main
