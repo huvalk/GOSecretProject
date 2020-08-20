@@ -7,7 +7,11 @@ type MapFile struct {
 	Name string `json:"name"`
 	Tag string `json:"tag"`
 	JSON string `json:"json"`
-	Changed time.Time `json:"tag"`
+	Changed time.Time `json:"changed"`
+}
+
+type MapFiles struct {
+	MapFiles []MapFile `json:"mapFiles"`
 }
 
 
