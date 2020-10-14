@@ -1,7 +1,7 @@
 package server
 
 import (
-	mapFilesHttp "GOSecretProject/core/mapfiles/delivery/http"
+	mapFilesHttp "GOSecretProject/core/auth/delivery/http"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/kataras/golog"
@@ -26,14 +26,14 @@ func (app *App) StartRouter() {
 
 	http.Handle("/", router)
 
-	port := 8001
+	port := 9000
 	golog.Infof("Server started at port :%d", port)
 	err := http.ListenAndServeTLS(fmt.Sprintf(":%d", port),
-		"/etc/letsencrypt/live/hahao.ru/fullchain.pem",
-		"/etc/letsencrypt/live/hahao.ru/privkey.pem",
+		"/etc/letsencrypt/live/ios.hahao.ru/fullchain.pem",
+		"/etc/letsencrypt/live/ios.hahao.ru/privkey.pem",
 		nil)
 
 	if err != nil {
-		golog.Error("Server haha failed: ", err)
+		golog.Error("Server ios.haha failed: ", err)
 	}
 }

@@ -1,4 +1,4 @@
-package mapFilesHttp
+package authHttp
 
 import (
 	"github.com/gorilla/mux"
@@ -7,5 +7,5 @@ import (
 func RegisterHTTPEndpoints(router *mux.Router) {
 	h := NewHandler()
 
-	router.HandleFunc("/map_files", h.GetMapFiles).Methods("GET")
+	router.HandleFunc("/login", h.Login).Methods("POST")
 }
