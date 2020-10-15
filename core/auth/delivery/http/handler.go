@@ -18,6 +18,12 @@ func NewHandler(repo authInterfaces.AuthRepository) *Handler {
 	}
 }
 
+func (h *Handler) Test(w http.ResponseWriter, r *http.Request) {
+	golog.Infof("Test ")
+
+	w.Write([]byte{})
+}
+
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	var user base.User
 	err := json.NewDecoder(r.Body).Decode(&user)
