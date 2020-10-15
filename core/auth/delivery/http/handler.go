@@ -21,7 +21,7 @@ func NewHandler(repo authInterfaces.AuthRepository) *Handler {
 func (h *Handler) Test(w http.ResponseWriter, r *http.Request) {
 	golog.Infof("Test ")
 
-	w.Write([]byte{})
+	w.Write([]byte("hello"))
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
