@@ -61,11 +61,17 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	switch code {
 	case 201:
+		golog.Error("201")
 		w.WriteHeader(http.StatusCreated)
 		json, _ := json.Marshal(user)
 		w.Write(json)
-	default:
+	case 401:
+		golog.Error("401")
 		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte{})
+	default:
+		golog.Error("500")
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte{})
 	}
 }

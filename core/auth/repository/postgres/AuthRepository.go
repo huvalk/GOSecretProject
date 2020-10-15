@@ -4,7 +4,6 @@ import (
 	"GOSecretProject/core/model/base"
 	"database/sql"
 	"encoding/base64"
-	"github.com/kataras/golog"
 )
 
 type AuthRepository struct {
@@ -33,7 +32,6 @@ func (r *AuthRepository) Login(user base.User) (userID int, session string, stat
 	rows := r.db.QueryRow(checkUser, user.Login)
 	err = rows.Scan(&userID, &hashedPwd)
 	if err != nil || user.Password != hashedPwd {
-		golog.Error(user.Password, hashedPwd, user.Password != hashedPwd)
 		return 0, "", 401, err
 	}
 
