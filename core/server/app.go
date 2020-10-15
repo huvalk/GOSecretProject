@@ -4,6 +4,7 @@ import (
 	authHttp "GOSecretProject/core/auth/delivery/http"
 	authInterfaces "GOSecretProject/core/auth/interfaces"
 	authRepository "GOSecretProject/core/auth/repository/postgres"
+	"GOSecretProject/core/model/base"
 	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -35,6 +36,13 @@ func NewApp() *App {
 	}
 
 	authRepo := authRepository.NewAuthRepository(db)
+	authRepo.Register(base.User{
+		ID:       1,
+		Login:    "a",
+		Password: "a",
+		Phone:    "a",
+		Session:  "a",
+	})
 
 	return &App{
 		authRepo: authRepo,
