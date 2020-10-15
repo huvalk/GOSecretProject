@@ -4,6 +4,7 @@ import (
 	"GOSecretProject/core/model/base"
 	"database/sql"
 	"encoding/base64"
+	"time"
 )
 
 type AuthRepository struct {
@@ -36,7 +37,7 @@ func (r *AuthRepository) Login(user base.User) (userID int, session string, stat
 	}
 
 	//TODO Сделать генерацию токена
-	session = base64.StdEncoding.EncodeToString([]byte(user.Login + user.Password))
+	session = base64.StdEncoding.EncodeToString([]byte(user.Login + user.Password + time.Now().String()))
 
 	insertSession := `INSERT INTO session (user_id, session_id) 
 					VALUES($1, $2)`
