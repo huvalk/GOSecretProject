@@ -6,7 +6,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
     working_dir: /go/src/GOSecretProject/cmd/
     ports:
-      - "8001:8001"
+      - "9000:9000"
     stdin_open: true
     tty: true
     network_mode: host

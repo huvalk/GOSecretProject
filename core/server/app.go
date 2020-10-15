@@ -1,19 +1,43 @@
 package server
 
 import (
-	mapFilesHttp "GOSecretProject/core/auth/delivery/http"
+	authHttp "GOSecretProject/core/auth/delivery/http"
+	authInterfaces "GOSecretProject/core/auth/interfaces"
+	authRepository "GOSecretProject/core/auth/repository/postgres"
+	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/kataras/golog"
+	_ "github.com/lib/pq"
+	"log"
 	"net/http"
+	"os"
 )
 
 type App struct {
-
+	authRepo authInterfaces.AuthRepository
 }
 
 func NewApp() *App {
-		return &App{
+	log.Print(os.Getenv("HAHA_DB_USER"), " !!! ", os.Getenv("HAHA_DB_PASSWORD"))
+	dbinfo := fmt.Sprintf("host=127.0.0.1 user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("HAHA_DB_USER"), os.Getenv("HAHA_DB_PASSWORD"), "ios")
+	db, err := sql.Open("postgres", dbinfo)
+
+	if err != nil {
+		golog.Error(err.Error())
+		return nil
+	}
+	err = db.Ping()
+	if err != nil {
+		golog.Error("DB: ", err.Error())
+		return nil
+	}
+
+	authRepo := authRepository.NewAuthRepository(db)
+
+	return &App{
+		authRepo: authRepo,
 	}
 }
 
@@ -22,7 +46,7 @@ func (app *App) StartRouter() {
 
 	commonRouter := router.PathPrefix("/api").Subrouter()
 
-	mapFilesHttp.RegisterHTTPEndpoints(commonRouter)
+	authHttp.RegisterHTTPEndpoints(commonRouter, app.authRepo)
 
 	http.Handle("/", router)
 

@@ -1,20 +1,41 @@
 package authHttp
 
 import (
+	authInterfaces "GOSecretProject/core/auth/interfaces"
 	"GOSecretProject/core/model/base"
 	"encoding/json"
 	"github.com/kataras/golog"
 	"net/http"
-	"time"
 )
 
 type Handler struct {
-
+	repo authInterfaces.AuthRepository
 }
 
-func NewHandler() *Handler {
+func NewHandler(repo authInterfaces.AuthRepository) *Handler {
 	return &Handler{
+		repo: repo,
+	}
+}
 
+func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
+	var user base.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		golog.Errorf("Register ", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	golog.Infof("Register ", user)
+
+	err = h.repo.Register(user)
+
+	if err != nil {
+		w.WriteHeader(http.StatusCreated)
+		w.Write([]byte{})
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte{})
 	}
 }
 
@@ -26,23 +47,39 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	golog.Infof("Login ", user)
 
-	if user.Login == "root" && user.Password == "root" {
-		cookie := &http.Cookie{
-			Name:     "session_id",
-			Value:    user.Login + user.Password,
-			Expires:  time.Now().Add(time.Hour),
-			MaxAge:   100000,
-			Path:     "/",
-			HttpOnly: true,
-		}
-		http.SetCookie(w, cookie)
+	var code int
+	user.ID, user.Session, code = h.repo.Login(user)
 
+	switch code {
+	case 201:
 		w.WriteHeader(http.StatusCreated)
-	} else {
+		json, _ := json.Marshal(user)
+		w.Write(json)
+	default:
 		w.WriteHeader(http.StatusUnauthorized)
-		//json := byte("")
-		//w.Write(json)
+		w.Write([]byte{})
+	}
+}
+
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	var user base.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		golog.Errorf("Logout ", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	golog.Infof("Logout ", user)
+
+	err = h.repo.Logout(user.Session)
+
+	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte{})
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte{})
 	}
 }
