@@ -70,7 +70,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte{})
 	default:
-		golog.Error("500")
+		golog.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte{})
 	}
