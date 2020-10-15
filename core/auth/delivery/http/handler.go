@@ -65,7 +65,6 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		json, _ := json.Marshal(user)
 		w.Write(json)
 	default:
-		golog.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte{})
 	}

@@ -31,7 +31,7 @@ func (r *AuthRepository) Login(user base.User) (userID int, session string, stat
 	var hashedPwd string
 	rows := r.db.QueryRow(checkUser, user.Login)
 	err = rows.Scan(&userID, &hashedPwd)
-	if err != nil || user.Password == hashedPwd {
+	if err != nil || user.Password != hashedPwd {
 		return 0, "", 401, err
 	}
 
