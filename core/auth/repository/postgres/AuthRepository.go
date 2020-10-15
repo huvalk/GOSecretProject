@@ -22,9 +22,6 @@ func (r *AuthRepository) Register(user base.User) (err error) {
 	err = r.db.QueryRow("INSERT INTO users (login, password, phone) VALUES($1, $2, $3) RETURNING id",
 		user.Login, user.Password, user.Phone).
 		Scan(&personID)
-	if err != nil {
-		return err
-	}
 
 	return err
 }

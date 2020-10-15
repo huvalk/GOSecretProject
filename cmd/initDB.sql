@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS session (
     user_id INT NOT NULL,
-    session TEXT NOT NULL DEFAULT '' UNIQUE
+    session_id TEXT NOT NULL DEFAULT '' UNIQUE
 )

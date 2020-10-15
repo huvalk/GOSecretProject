@@ -28,11 +28,11 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	var user base.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		golog.Errorf("Register ", err)
+		golog.Errorf("Register error: ", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	golog.Infof("Register ", user)
+	golog.Infof("Register: ", user.Login)
 
 	err = h.repo.Register(user)
 
@@ -49,11 +49,11 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var user base.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		golog.Errorf("Login ", err)
+		golog.Errorf("Login error: ", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	golog.Infof("Login ", user)
+	golog.Infof("Login: ", user)
 
 	var code int
 	user.ID, user.Session, code = h.repo.Login(user)
@@ -73,11 +73,11 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	var user base.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		golog.Errorf("Logout ", err)
+		golog.Errorf("Logout error: ", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	golog.Infof("Logout ", user)
+	golog.Infof("Logout: ", user)
 
 	err = h.repo.Logout(user.Session)
 
