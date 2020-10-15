@@ -36,10 +36,11 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	err = h.repo.Register(user)
 
-	if err != nil {
+	if err == nil {
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte{})
 	} else {
+		golog.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte{})
 	}
@@ -56,7 +57,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	golog.Infof("Login: %s", user)
 
 	var code int
-	user.ID, user.Session, code = h.repo.Login(user)
+	user.ID, user.Session, code, err = h.repo.Login(user)
 
 	switch code {
 	case 201:
@@ -64,6 +65,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		json, _ := json.Marshal(user)
 		w.Write(json)
 	default:
+		golog.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte{})
 	}
@@ -81,10 +83,11 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 
 	err = h.repo.Logout(user.Session)
 
-	if err != nil {
+	if err == nil {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte{})
 	} else {
+		golog.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte{})
 	}

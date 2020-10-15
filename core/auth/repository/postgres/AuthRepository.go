@@ -26,13 +26,13 @@ func (r *AuthRepository) Register(user base.User) (err error) {
 	return err
 }
 
-func (r *AuthRepository) Login(user base.User) (userID int, session string, statusCode int) {
+func (r *AuthRepository) Login(user base.User) (userID int, session string, statusCode int, err error) {
 	checkUser := "SELECT id, password FROM users WHERE login = $1"
 	var hashedPwd string
 	rows := r.db.QueryRow(checkUser, user.Login)
-	err := rows.Scan(&userID, &hashedPwd)
+	err = rows.Scan(&userID, &hashedPwd)
 	if err != nil || user.Password == hashedPwd {
-		return 0, "", 401
+		return 0, "", 401, err
 	}
 
 	//TODO Сделать генерацию токена
@@ -41,8 +41,11 @@ func (r *AuthRepository) Login(user base.User) (userID int, session string, stat
 	insertSession := `INSERT INTO session (user_id, session_id) 
 					VALUES($1, $2)`
 	_, err = r.db.Exec(insertSession, userID, session)
+	if err != nil {
+		return 0, "", 500, err
+	}
 
-	return userID, session, 201
+	return userID, session, 201, nil
 }
 
 func (r *AuthRepository) Logout(session string) (err error) {
