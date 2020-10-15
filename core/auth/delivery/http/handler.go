@@ -32,7 +32,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	golog.Infof("Register: ", user.Login)
+	golog.Infof("Register: %s", user.Login)
 
 	err = h.repo.Register(user)
 
@@ -53,7 +53,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	golog.Infof("Login: ", user)
+	golog.Infof("Login: %s", user)
 
 	var code int
 	user.ID, user.Session, code = h.repo.Login(user)
@@ -77,7 +77,7 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	golog.Infof("Logout: ", user)
+	golog.Infof("Logout: %s", user)
 
 	err = h.repo.Logout(user.Session)
 
