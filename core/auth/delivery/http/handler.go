@@ -3,6 +3,7 @@ package authHttp
 import (
 	authInterfaces "GOSecretProject/core/auth/interfaces"
 	"GOSecretProject/core/model/base"
+	"GOSecretProject/core/utils/empty_status_json"
 	"encoding/json"
 	"github.com/kataras/golog"
 	"net/http"
@@ -30,6 +31,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		golog.Errorf("Register error: ", err)
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusBadRequest))
 		return
 	}
 	golog.Infof("Register: %s", user.Login)
@@ -38,11 +40,11 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil {
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte{})
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusCreated))
 	} else {
 		golog.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte{})
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
 	}
 }
 
@@ -52,6 +54,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		golog.Errorf("Login error: ", err)
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusBadRequest))
 		return
 	}
 	golog.Infof("Login: %s", user)
@@ -68,11 +71,11 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	case 401:
 		golog.Error("401")
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte{})
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusUnauthorized))
 	default:
 		golog.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte{})
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
 	}
 }
 
@@ -82,6 +85,7 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		golog.Errorf("Logout error: ", err)
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusBadRequest))
 		return
 	}
 	golog.Infof("Logout: %s", user)
@@ -90,10 +94,10 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte{})
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusOK))
 	} else {
 		golog.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte{})
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
 	}
 }
