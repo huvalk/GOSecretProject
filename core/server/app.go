@@ -4,6 +4,7 @@ import (
 	authHttp "GOSecretProject/core/auth/delivery/http"
 	authInterfaces "GOSecretProject/core/auth/interfaces"
 	authRepository "GOSecretProject/core/auth/repository/postgres"
+	"GOSecretProject/core/middleware"
 	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -45,6 +46,11 @@ func (app *App) StartRouter() {
 	router := mux.NewRouter()
 
 	commonRouter := router.PathPrefix("/api").Subrouter()
+	m := middleware.NewMiddleware()
+	router.Use(m.RecoveryMiddleware)
+	router.Use(m.LogMiddleware)
+	router.Use(m.ContentTypeMiddleware)
+	//mAuth := middleware.NewAuthMiddleware(app.authRepo)
 
 	authHttp.RegisterHTTPEndpoints(commonRouter, app.authRepo)
 

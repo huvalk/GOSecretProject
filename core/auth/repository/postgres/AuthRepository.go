@@ -36,7 +36,7 @@ func (r *AuthRepository) Login(user base.User) (userID int, session string, stat
 		return 0, "", 401, err
 	}
 
-	//TODO Сделать генерацию токена
+	//TODO Сделать генерацию токена, разрешить повторную авторизацию
 	session = base64.StdEncoding.EncodeToString([]byte(user.Login + user.Password + time.Now().String()))
 
 	insertSession := `INSERT INTO session (user_id, session_id) 
