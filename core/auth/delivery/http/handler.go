@@ -114,9 +114,14 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 		w.Write(empty_status_json.JsonWithStatusCode(http.StatusBadRequest))
 	}
 
-	if true {
+	//code := base64.StdEncoding.EncodeToString([]byte(time.Now().String()))[:4]
+	//err := h.smsSender.SendSMS("", phone)
+	code := "2222"
+	var err error = nil
+
+	if err == nil {
 		w.WriteHeader(http.StatusOK)
-		json, _ := json.Marshal(base.CodeConfirmation{Code: "2222"})
+		json, _ := json.Marshal(base.CodeConfirmation{Code: code})
 		w.Write(json)
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
