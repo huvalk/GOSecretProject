@@ -4,18 +4,22 @@ import (
 	authInterfaces "GOSecretProject/core/auth/interfaces"
 	"GOSecretProject/core/model/base"
 	"GOSecretProject/core/utils/empty_status_json"
+	"GOSecretProject/core/utils/sms"
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/kataras/golog"
 	"net/http"
 )
 
 type Handler struct {
 	repo authInterfaces.AuthRepository
+	smsSender *sms.SMS
 }
 
 func NewHandler(repo authInterfaces.AuthRepository) *Handler {
 	return &Handler{
 		repo: repo,
+		smsSender: sms.NewSMS(),
 	}
 }
 
@@ -97,6 +101,24 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		w.Write(empty_status_json.JsonWithStatusCode(http.StatusOK))
 	} else {
 		golog.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
+	}
+}
+
+func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
+	phone, _ := mux.Vars(r)["phone"]
+	if !h.smsSender.ValidatePhoneNumber(phone) {
+		golog.Error("Not valid phone: ", phone)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusBadRequest))
+	}
+
+	if true {
+		w.WriteHeader(http.StatusOK)
+		json, _ := json.Marshal(base.CodeConfirmation{Code: "2222"})
+		w.Write(json)
+	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
 	}

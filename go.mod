@@ -6,6 +6,8 @@ require (
 	github.com/gorilla/mux v1.7.4
 	github.com/kataras/golog v0.1.2
 	github.com/lib/pq v1.8.0
+	github.com/subosito/twilio v0.0.1 // indirect
+	github.com/vonage/vonage-go-sdk v0.12.2 // indirect
 	golang.org/x/crypto v0.0.0-20201012173705-84dcc777aaee // indirect
 	golang.org/x/sys v0.0.0-20200819141100-7c7a22168250 // indirect
 )
