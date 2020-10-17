@@ -20,7 +20,7 @@ func NewSMS() *SMS {
 	AccountSid, AuthToken := "AC74e2da512adfcb3015b636fee644dd6a", "65f0ac55235f41291bf37fc47d95ec58"
 	return &SMS{
 		c: http.Client{},
-		exp: regexp.MustCompile(`^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$`),
+		exp: regexp.MustCompile(`(0|\\+62|062|62)[0-9]+$`),
 		accountSid: AccountSid,
 		authToken: AuthToken,
 	}
