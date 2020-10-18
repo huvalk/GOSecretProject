@@ -128,3 +128,26 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
 	}
 }
+
+func (h *Handler) CheckSession(w http.ResponseWriter, r *http.Request) {
+	var session base.SessionConfirmation
+	err := json.NewDecoder(r.Body).Decode(&session)
+	if err != nil {
+		golog.Errorf("Session error: ", err)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusBadRequest))
+		return
+	}
+	golog.Infof("Session: %s", session)
+
+	err = h.repo.CheckSession(session.Session)
+
+	if err == nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusOK))
+	} else {
+		golog.Error(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusUnauthorized))
+	}
+}
