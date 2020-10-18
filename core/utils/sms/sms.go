@@ -19,6 +19,7 @@ type SMS struct {
 func NewSMS() *SMS {
 	//AccountSid, AuthToken := "AC74e2da512adfcb3015b636fee644dd6a", "8de195d83afb98a4287b95297db15ffc"
 	API_KEY, API_SECRET := os.Getenv("API_KEY"), os.Getenv("API_SECRET")
+	golog.Infof("SMS started: %s, %s", API_KEY, API_SECRET)
 	return &SMS{
 		c: http.Client{},
 
