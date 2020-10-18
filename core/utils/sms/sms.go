@@ -4,6 +4,7 @@ import (
 	"github.com/kataras/golog"
 	"github.com/vonage/vonage-go-sdk"
 	"net/http"
+	"os"
 	"regexp"
 )
 
@@ -17,7 +18,7 @@ type SMS struct {
 
 func NewSMS() *SMS {
 	//AccountSid, AuthToken := "AC74e2da512adfcb3015b636fee644dd6a", "8de195d83afb98a4287b95297db15ffc"
-	API_KEY, API_SECRET := "873fed4d", "TcI0spIw2496O0Ql"
+	API_KEY, API_SECRET := os.Getenv("API_KEY"), os.Getenv("API_SECRET")
 	return &SMS{
 		c: http.Client{},
 
