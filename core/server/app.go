@@ -20,9 +20,9 @@ type App struct {
 }
 
 func NewApp() *App {
-	log.Print(os.Getenv("HAHA_DB_USER"), " !!! ", os.Getenv("HAHA_DB_PASSWORD"))
+	log.Print(os.Getenv("POSTGRES_USER"), " !!! ", os.Getenv("POSTGRES_PASSWORD"))
 	dbinfo := fmt.Sprintf("host=127.0.0.1 user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("HAHA_DB_USER"), os.Getenv("HAHA_DB_PASSWORD"), "ios")
+		os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), "ios")
 	db, err := sql.Open("postgres", dbinfo)
 
 	if err != nil {
