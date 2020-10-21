@@ -5,6 +5,10 @@ import (
 	authInterfaces "GOSecretProject/core/auth/interfaces"
 	authRepository "GOSecretProject/core/auth/repository/postgres"
 	"GOSecretProject/core/middleware"
+	recipeHttp "GOSecretProject/core/recipe/delivery/http"
+	recipeInterfaces "GOSecretProject/core/recipe/interfaces"
+	"GOSecretProject/core/recipe/repository/postgres"
+	"GOSecretProject/core/recipe/usecase"
 	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -17,6 +21,7 @@ import (
 
 type App struct {
 	authRepo authInterfaces.AuthRepository
+	recipeUseCase recipeInterfaces.RecipeUseCase
 }
 
 func NewApp() *App {
@@ -36,9 +41,13 @@ func NewApp() *App {
 	}
 
 	authRepo := authRepository.NewAuthRepository(db)
+	recipeRepository := postgres.NewRecipeRepository(db)
+
+	recipeUseCase := usecase.NewRecipeUseCase(recipeRepository)
 
 	return &App{
 		authRepo: authRepo,
+		recipeUseCase: recipeUseCase,
 	}
 }
 
@@ -53,6 +62,7 @@ func (app *App) StartRouter() {
 	//mAuth := middleware.NewAuthMiddleware(app.authRepo)
 
 	authHttp.RegisterHTTPEndpoints(commonRouter, app.authRepo)
+	recipeHttp.RegisterHTTPEndpoints(commonRouter, app.recipeUseCase)
 
 	http.Handle("/", router)
 

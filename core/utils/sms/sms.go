@@ -9,11 +9,11 @@ import (
 )
 
 type SMS struct {
-	c http.Client
-	auth *vonage.KeySecretAuth
-	exp *regexp.Regexp
+	c          http.Client
+	auth       *vonage.KeySecretAuth
+	exp        *regexp.Regexp
 	accountSid string
-	authToken string
+	authToken  string
 }
 
 func NewSMS() *SMS {
@@ -22,10 +22,10 @@ func NewSMS() *SMS {
 	return &SMS{
 		c: http.Client{},
 
-		auth: vonage.CreateAuthFromKeySecret(API_KEY, API_SECRET),
-		exp: regexp.MustCompile(`(0|\\+62|062|62)[0-9]+$`),
+		auth:       vonage.CreateAuthFromKeySecret(API_KEY, API_SECRET),
+		exp:        regexp.MustCompile(`(0|\\+62|062|62)[0-9]+$`),
 		accountSid: API_KEY,
-		authToken: API_SECRET,
+		authToken:  API_SECRET,
 	}
 }
 

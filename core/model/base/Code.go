@@ -1,4 +1,4 @@
-package base
+package baseModels
 
 type CodeConfirmation struct {
 	Code string `json:"code"`

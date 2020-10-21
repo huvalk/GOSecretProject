@@ -17,7 +17,7 @@ func NewAuthRepository(db *sql.DB) *AuthRepository {
 	}
 }
 
-func (r *AuthRepository) Register(user base.User) (err error) {
+func (r *AuthRepository) Register(user baseModels.User) (err error) {
 	var personID uint64
 
 	err = r.db.QueryRow("INSERT INTO users (login, password, phone) VALUES($1, $2, $3) RETURNING id",
@@ -27,7 +27,7 @@ func (r *AuthRepository) Register(user base.User) (err error) {
 	return err
 }
 
-func (r *AuthRepository) Login(user base.User) (userID int, session string, statusCode int, err error) {
+func (r *AuthRepository) Login(user baseModels.User) (userID int, session string, statusCode int, err error) {
 	checkUser := "SELECT id, password FROM users WHERE login = $1"
 	var hashedPwd string
 	rows := r.db.QueryRow(checkUser, user.Login)

@@ -12,13 +12,13 @@ import (
 )
 
 type Handler struct {
-	repo authInterfaces.AuthRepository
+	repo      authInterfaces.AuthRepository
 	smsSender *sms.SMS
 }
 
 func NewHandler(repo authInterfaces.AuthRepository) *Handler {
 	return &Handler{
-		repo: repo,
+		repo:      repo,
 		smsSender: sms.NewSMS(),
 	}
 }
@@ -30,7 +30,7 @@ func (h *Handler) Test(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
-	var user base.User
+	var user baseModels.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		golog.Errorf("Register error: ", err)
@@ -53,7 +53,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
-	var user base.User
+	var user baseModels.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		golog.Errorf("Login error: ", err)
@@ -84,7 +84,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
-	var user base.User
+	var user baseModels.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		golog.Errorf("Logout error: ", err)
@@ -121,7 +121,7 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil {
 		w.WriteHeader(http.StatusOK)
-		json, _ := json.Marshal(base.CodeConfirmation{Code: code})
+		json, _ := json.Marshal(baseModels.CodeConfirmation{Code: code})
 		w.Write(json)
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -130,7 +130,7 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) CheckSession(w http.ResponseWriter, r *http.Request) {
-	var session base.SessionConfirmation
+	var session baseModels.SessionConfirmation
 	err := json.NewDecoder(r.Body).Decode(&session)
 	if err != nil {
 		golog.Errorf("Session error: ", err)
