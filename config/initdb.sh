@@ -1,4 +1,6 @@
--- create database manualy before this script
+#!/bin/bash
+
+psql --username "$POSTGRES_USER" -d "POSTGRES_DB" <<-EOSQL
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -36,3 +38,5 @@ CREATE TABLE IF NOT EXISTS favorites (
     CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT recipe_fkey FOEIGN KEY (recipe_id) REFERENCES recipe(id)
 );
+
+EOSQL
