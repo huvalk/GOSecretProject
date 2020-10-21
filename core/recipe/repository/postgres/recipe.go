@@ -34,8 +34,8 @@ func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 	var recipe baseModels.Recipe
 
 	query := "SELECT id, user_id, title, cooking_time, ingredients, steps FROM recipe WHERE id = $1"
-	err := r.db.QueryRow(query, id).
-		Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime, &recipe.Ingredients, &recipe.Steps)
+	err := r.db.QueryRow(query, id).Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
+		pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps))
 	if err != nil {
 		return nil, err
 	}
