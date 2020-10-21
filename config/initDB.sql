@@ -22,10 +22,10 @@ CREATE TABLE IF NOT EXISTS recipe (
     CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES users(id)
 )
 
-CREATE TABLE IF NOT EXISTS rating {
+CREATE TABLE IF NOT EXISTS rating (
     user_id INTEGER NOT NULL,
     recipe_id INTEGER NOT NULL,
     stars INTEGER NOT NULL,
     CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT recipe_fkey FOREIGN KEY (recipe_id) REFERENCES recipe(id)
-}
+)
