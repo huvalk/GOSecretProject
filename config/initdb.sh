@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-psql --username "$POSTGRES_USER" -d "POSTGRES_DB" <<-EOSQL
+psql "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB?sslmode=disable" <<-EOSQL
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
