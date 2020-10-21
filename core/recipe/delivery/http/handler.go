@@ -5,6 +5,7 @@ import (
 	"GOSecretProject/core/recipe/interfaces"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/kataras/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -21,6 +22,7 @@ func NewRecipeHandler(useCase recipeInterfaces.RecipeUseCase) *recipeHandler {
 func (h *recipeHandler) CreateRecipe(w http.ResponseWriter, r *http.Request) {
 	recipeByte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -29,12 +31,14 @@ func (h *recipeHandler) CreateRecipe(w http.ResponseWriter, r *http.Request) {
 	var recipe baseModels.Recipe
 	err = json.Unmarshal(recipeByte, &recipe)
 	if err != nil {
+		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	err = h.useCase.CreateRecipe(&recipe)
 	if err != nil {
+		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -46,18 +50,21 @@ func (h *recipeHandler) GetRecipe(w http.ResponseWriter, r *http.Request) {
 	idString := mux.Vars(r)["id"]
 	id, err := strconv.ParseUint(idString, 10, 64)
 	if err != nil {
+		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	recipe, err := h.useCase.GetRecipe(id)
 	if err != nil {
+		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	recipeJson, err := json.Marshal(recipe)
 	if err != nil {
+		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
