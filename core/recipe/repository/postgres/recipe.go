@@ -3,6 +3,7 @@ package postgres
 import (
 	baseModels "GOSecretProject/core/model/base"
 	"database/sql"
+	"github.com/kataras/golog"
 	"github.com/lib/pq"
 )
 
@@ -15,13 +16,17 @@ func NewRecipeRepository(db *sql.DB) *recipeRepository {
 }
 
 func (r *recipeRepository) CreateRecipe(recipe *baseModels.Recipe) (err error) {
-	query := "INSERT INTO recipe (user_id, title, cooking_time, ingredients, steps) VALUES ($1, $2, $3, $4, $5)"
-	_, err = r.db.Exec(query, &recipe.Author, &recipe.Title, recipe.CookingTime,
-		pq.Array(recipe.Ingredients), pq.Array(&recipe.Steps))
+	var id uint64
+
+	query := "INSERT INTO recipe (user_id, title, cooking_time, ingredients, steps)" +
+		"VALUES ($1, $2, $3, $4, $5) RETURNING id"
+	err = r.db.QueryRow(query, &recipe.Author, &recipe.Title, &recipe.CookingTime,
+		pq.Array(recipe.Ingredients), pq.Array(&recipe.Steps)).Scan(&id)
 	if err != nil {
 		return err
 	}
 
+	golog.Infof("Created recipe with id %d", id)
 	return nil
 }
 
