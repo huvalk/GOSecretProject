@@ -65,3 +65,13 @@ func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Rec
 
 	return recipes, nil
 }
+
+func (r *recipeRepository) AddToFavorites(userId, recipeId uint64) (err error) {
+	query := "INSERT INTO favorites (user_id, recipe_id) VALUES ($1, $2)"
+	_, err = r.db.Exec(query, userId, recipeId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

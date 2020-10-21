@@ -24,3 +24,7 @@ func (u *recipeUseCase) GetRecipe(id uint64) (recipe *baseModels.Recipe, err err
 func (u *recipeUseCase) GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error) {
 	return u.repository.GetRecipes(authorId)
 }
+
+func (u *recipeUseCase) AddToFavorites(userId, recipeId uint64) (err error) {
+	return u.repository.AddToFavorites(userId, recipeId)
+}

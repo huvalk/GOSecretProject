@@ -29,3 +29,10 @@ CREATE TABLE IF NOT EXISTS rating (
     CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT recipe_fkey FOREIGN KEY (recipe_id) REFERENCES recipe(id)
 );
+
+CREATE TABLE IF NOT EXISTS favorites (
+    user_id INTEGER NOT NULL,
+    recipe_id INTEGER NOT NULL,
+    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT recipe_fkey FOEIGN KEY (recipe_id) REFERENCES recipe(id)
+);
