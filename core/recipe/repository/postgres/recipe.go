@@ -54,7 +54,8 @@ func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Rec
 	for rows.Next() {
 		var recipe baseModels.Recipe
 
-		err = rows.Scan(&recipe)
+		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps))
 		if err != nil {
 			return nil, err
 		}
