@@ -72,3 +72,30 @@ func (h *recipeHandler) GetRecipe(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(recipeJson)
 }
+
+func (h *recipeHandler) GetRecipes(w http.ResponseWriter, r *http.Request) {
+	authorIdString := mux.Vars(r)["id"]
+	authorId, err := strconv.ParseUint(authorIdString, 10, 64)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	recipes, err := h.useCase.GetRecipes(authorId)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	recipesJson, err := json.Marshal(recipes)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(recipesJson)
+}

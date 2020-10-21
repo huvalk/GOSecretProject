@@ -42,3 +42,25 @@ func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 
 	return &recipe, nil
 }
+
+func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error) {
+	query := "SELECT id, user_id, title, cooking_time, ingredients, steps FROM recipe WHERE user_id = $1"
+	rows, err := r.db.Query(query, authorId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var recipe baseModels.Recipe
+
+		err = rows.Scan(&recipe)
+		if err != nil {
+			return nil, err
+		}
+
+		recipes = append(recipes, recipe)
+	}
+
+	return recipes, nil
+}
