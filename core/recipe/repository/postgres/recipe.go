@@ -3,6 +3,7 @@ package postgres
 import (
 	baseModels "GOSecretProject/core/model/base"
 	"database/sql"
+	"github.com/lib/pq"
 )
 
 type recipeRepository struct {
@@ -15,7 +16,8 @@ func NewRecipeRepository(db *sql.DB) *recipeRepository {
 
 func (r *recipeRepository) CreateRecipe(recipe *baseModels.Recipe) (err error) {
 	query := "INSERT INTO recipe (user_id, title, cooking_time, ingredients, steps) VALUES ($1, $2, $3, $4, $5)"
-	_, err = r.db.Exec(query, &recipe.Author, &recipe.Title, &recipe.CookingTime, &recipe.Ingredients, &recipe.Steps)
+	_, err = r.db.Exec(query, &recipe.Author, &recipe.Title, recipe.CookingTime,
+		pq.Array(recipe.Ingredients), pq.Array(&recipe.Steps))
 	if err != nil {
 		return err
 	}
