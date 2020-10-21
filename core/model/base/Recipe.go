@@ -1,5 +1,5 @@
 package baseModels
-coi
+
 type Recipe struct {
 	Id          uint64   `json:"id"`
 	Author      uint64   `json:"author"`
