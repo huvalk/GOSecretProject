@@ -144,7 +144,7 @@ func (h *recipeHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	recipes, err := h.useCase.GetRecipes(userId)
+	recipes, err := h.useCase.GetFavorites(userId)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
