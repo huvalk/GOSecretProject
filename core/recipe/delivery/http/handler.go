@@ -134,3 +134,30 @@ func (h *recipeHandler) AddToFavorites(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func (h *recipeHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
+	userIdString := mux.Vars(r)["id"]
+	userId, err := strconv.ParseUint(userIdString, 10, 64)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	recipes, err := h.useCase.GetRecipes(userId)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	recipesJson, err := json.Marshal(recipes)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(recipesJson)
+}

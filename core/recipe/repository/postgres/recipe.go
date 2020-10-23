@@ -75,3 +75,27 @@ func (r *recipeRepository) AddToFavorites(userId, recipeId uint64) (err error) {
 
 	return nil
 }
+
+func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error) {
+	query := "SELECT r.id, r.user_id, r.title, r.cooking_time, r.ingredients, r.steps FROM favorites f" +
+		"LEFT JOIN recipe r ON f.recipe_id = r.id WHERE f.user_id = $1"
+	rows, err := r.db.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var recipe baseModels.Recipe
+
+		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps))
+		if err != nil {
+			return nil, err
+		}
+
+		recipes = append(recipes, recipe)
+	}
+
+	return recipes, nil
+}
