@@ -18,7 +18,7 @@ func NewRecipeRepository(db *sql.DB) *recipeRepository {
 func (r *recipeRepository) CreateRecipe(recipe *baseModels.Recipe) (err error) {
 	var id uint64
 
-	query := "INSERT INTO recipe (user_id, title, cooking_time, ingredients, steps)" +
+	query := "INSERT INTO recipe (user_id, title, cooking_time, ingredients, steps) " +
 		"VALUES ($1, $2, $3, $4, $5) RETURNING id"
 	err = r.db.QueryRow(query, &recipe.Author, &recipe.Title, &recipe.CookingTime,
 		pq.Array(recipe.Ingredients), pq.Array(&recipe.Steps)).Scan(&id)
@@ -77,7 +77,7 @@ func (r *recipeRepository) AddToFavorites(userId, recipeId uint64) (err error) {
 }
 
 func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error) {
-	query := "SELECT r.id, r.user_id, r.title, r.cooking_time, r.ingredients, r.steps FROM favorites f" +
+	query := "SELECT r.id, r.user_id, r.title, r.cooking_time, r.ingredients, r.steps FROM favorites f " +
 		"LEFT JOIN recipe r ON f.recipe_id = r.id WHERE f.user_id = $1"
 	rows, err := r.db.Query(query, userId)
 	if err != nil {
