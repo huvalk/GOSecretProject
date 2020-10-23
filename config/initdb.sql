@@ -1,7 +1,3 @@
-#!/usr/bin/env bash
-
-psql "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB?sslmode=disable" <<-EOSQL
-
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     login TEXT NOT NULL DEFAULT '',
@@ -38,5 +34,3 @@ CREATE TABLE IF NOT EXISTS favorites (
     CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT recipe_fkey FOEIGN KEY (recipe_id) REFERENCES recipe(id)
 );
-
-EOSQL
