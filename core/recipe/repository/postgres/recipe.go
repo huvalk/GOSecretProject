@@ -130,7 +130,7 @@ func (r *recipeRepository) VoteRecipe(userId, recipeId, stars uint64) (rating fl
 
 	query = `
 		SELECT COALESCE(SUM(stars)::numeric/COUNT(stars), 0) stars
-		FROM rating WHERE recipe_id = 7 GROUP BY recipe_id`
+		FROM rating WHERE recipe_id = $1 GROUP BY recipe_id`
 	err = r.db.QueryRow(query, recipeId).Scan(&rating)
 	if err != nil {
 		return 0, err
