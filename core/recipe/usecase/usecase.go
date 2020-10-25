@@ -32,3 +32,11 @@ func (u *recipeUseCase) AddToFavorites(userId, recipeId uint64) (err error) {
 func (u *recipeUseCase) GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error) {
 	return u.repository.GetFavorites(userId)
 }
+
+func (u *recipeUseCase) VoteRecipe(userId, recipeId, stars uint64) (err error) {
+	return u.repository.VoteRecipe(userId, recipeId, stars)
+}
+
+func (u *recipeUseCase) GetRating(recipeId uint64) (stars float64, err error) {
+	return u.repository.GetRating(recipeId)
+}

@@ -161,3 +161,38 @@ func (h *recipeHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(recipesJson)
 }
+
+func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
+	recipeIdString := mux.Vars(r)["id"]
+	recipeId, err := strconv.ParseUint(recipeIdString, 10, 64)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	voteByte, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	defer r.Body.Close()
+
+	var voteMap map[string]uint64
+	err = json.Unmarshal(voteByte, &voteMap)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = h.useCase.VoteRecipe(voteMap["userId"], recipeId, voteMap["stars"])
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

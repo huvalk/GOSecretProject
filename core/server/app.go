@@ -20,7 +20,7 @@ import (
 )
 
 type App struct {
-	authRepo authInterfaces.AuthRepository
+	authRepo      authInterfaces.AuthRepository
 	recipeUseCase recipeInterfaces.RecipeUseCase
 }
 
@@ -46,7 +46,7 @@ func NewApp() *App {
 	recipeUseCase := usecase.NewRecipeUseCase(recipeRepository)
 
 	return &App{
-		authRepo: authRepo,
+		authRepo:      authRepo,
 		recipeUseCase: recipeUseCase,
 	}
 }

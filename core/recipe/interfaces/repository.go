@@ -1,6 +1,6 @@
 package recipeInterfaces
 
-import baseModels "GOSecretProject/core/model/base"
+import "GOSecretProject/core/model/base"
 
 type RecipeRepository interface {
 	CreateRecipe(recipe *baseModels.Recipe) (err error)
@@ -8,4 +8,5 @@ type RecipeRepository interface {
 	GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error)
 	AddToFavorites(userId, recipeId uint64) (err error)
 	GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error)
+	VoteRecipe(userId, recipeId, stars uint64) (err error)
 }

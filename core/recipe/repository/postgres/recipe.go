@@ -18,8 +18,9 @@ func NewRecipeRepository(db *sql.DB) *recipeRepository {
 func (r *recipeRepository) CreateRecipe(recipe *baseModels.Recipe) (err error) {
 	var id uint64
 
-	query := "INSERT INTO recipe (user_id, title, cooking_time, ingredients, steps) " +
-		"VALUES ($1, $2, $3, $4, $5) RETURNING id"
+	query := `
+		INSERT INTO recipe (user_id, title, cooking_time, ingredients, steps)
+		VALUES ($1, $2, $3, $4, $5) RETURNING id`
 	err = r.db.QueryRow(query, &recipe.Author, &recipe.Title, &recipe.CookingTime,
 		pq.Array(recipe.Ingredients), pq.Array(&recipe.Steps)).Scan(&id)
 	if err != nil {
@@ -33,9 +34,15 @@ func (r *recipeRepository) CreateRecipe(recipe *baseModels.Recipe) (err error) {
 func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 	var recipe baseModels.Recipe
 
-	query := "SELECT id, user_id, title, cooking_time, ingredients, steps FROM recipe WHERE id = $1"
+	query := `
+		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
+			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
+		FROM recipe re
+		LEFT JOIN rating ra ON re.id = ra.recipe_id
+		WHERE re.id = 7
+		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
 	err := r.db.QueryRow(query, id).Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
-		pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps))
+		pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +51,13 @@ func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 }
 
 func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error) {
-	query := "SELECT id, user_id, title, cooking_time, ingredients, steps FROM recipe WHERE user_id = $1"
+	query := `
+		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
+			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
+		FROM recipe re
+		LEFT JOIN rating ra ON re.id = ra.recipe_id
+		WHERE re.user_id = $1
+		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
 	rows, err := r.db.Query(query, authorId)
 	if err != nil {
 		return nil, err
@@ -55,7 +68,7 @@ func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Rec
 		var recipe baseModels.Recipe
 
 		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
-			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps))
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
 		if err != nil {
 			return nil, err
 		}
@@ -77,8 +90,14 @@ func (r *recipeRepository) AddToFavorites(userId, recipeId uint64) (err error) {
 }
 
 func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error) {
-	query := "SELECT r.id, r.user_id, r.title, r.cooking_time, r.ingredients, r.steps FROM favorites f " +
-		"LEFT JOIN recipe r ON f.recipe_id = r.id WHERE f.user_id = $1"
+	query := `
+		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
+			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
+		FROM favorites f
+		LEFT JOIN recipe re ON f.recipe_id = re.id
+		LEFT JOIN rating ra ON f.recipe_id = ra.recipe_id
+		WHERE f.user_id = $1
+		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
 	rows, err := r.db.Query(query, userId)
 	if err != nil {
 		return nil, err
@@ -89,7 +108,7 @@ func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Rec
 		var recipe baseModels.Recipe
 
 		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
-			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps))
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
 		if err != nil {
 			return nil, err
 		}
@@ -98,4 +117,16 @@ func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Rec
 	}
 
 	return recipes, nil
+}
+
+func (r *recipeRepository) VoteRecipe(userId, recipeId, stars uint64) (err error) {
+	query := `
+		INSERT INTO rating (user_id, recipe_id, stars) VALUES ($1, $2, $3)
+		ON CONFLICT ON CONSTRAINT rating_user_id_recipe_id_key DO UPDATE SET stars = $3`
+	_, err = r.db.Exec(query, userId, recipeId, stars)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
