@@ -14,4 +14,5 @@ func RegisterHTTPEndpoints(router *mux.Router, useCase recipeInterfaces.RecipeUs
 	router.Handle("/users/{id:[0-9]+}/recipes", http.HandlerFunc(h.GetRecipes)).Methods("GET")
 	router.Handle("/recipe/{id:[0-9]+}/favorite", http.HandlerFunc(h.AddToFavorites)).Methods("POST")
 	router.Handle("/users/{id:[0-9]+}/favorites", http.HandlerFunc(h.GetFavorites)).Methods("GET")
+	router.Handle("/recipe/{id:[0-9]+}/vote", http.HandlerFunc(h.VoteRecipe)).Methods("POST")
 }

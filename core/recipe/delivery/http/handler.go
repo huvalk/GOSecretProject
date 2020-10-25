@@ -187,7 +187,14 @@ func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.useCase.VoteRecipe(voteMap["userId"], recipeId, voteMap["stars"])
+	rating, err := h.useCase.VoteRecipe(voteMap["userId"], recipeId, voteMap["stars"])
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	ratingJson, err := json.Marshal(rating)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -195,4 +202,5 @@ func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(ratingJson)
 }

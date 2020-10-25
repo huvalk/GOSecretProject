@@ -119,14 +119,20 @@ func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Rec
 	return recipes, nil
 }
 
-func (r *recipeRepository) VoteRecipe(userId, recipeId, stars uint64) (err error) {
+func (r *recipeRepository) VoteRecipe(userId, recipeId, stars uint64) (rating float64, err error) {
 	query := `
 		INSERT INTO rating (user_id, recipe_id, stars) VALUES ($1, $2, $3)
 		ON CONFLICT ON CONSTRAINT rating_user_id_recipe_id_key DO UPDATE SET stars = $3`
 	_, err = r.db.Exec(query, userId, recipeId, stars)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	query = "SELECT SUM(stars)::numeric/COUNT(stars) stars FROM rating WHERE recipe_id = 7 GROUP BY recipe_id"
+	err = r.db.QueryRow(query, recipeId).Scan(&rating)
+	if err != nil {
+		return 0, err
+	}
+
+	return rating, nil
 }

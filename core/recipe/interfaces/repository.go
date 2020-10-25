@@ -8,5 +8,5 @@ type RecipeRepository interface {
 	GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error)
 	AddToFavorites(userId, recipeId uint64) (err error)
 	GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error)
-	VoteRecipe(userId, recipeId, stars uint64) (err error)
+	VoteRecipe(userId, recipeId, stars uint64) (rating float64, err error)
 }
