@@ -36,7 +36,3 @@ func (u *recipeUseCase) GetFavorites(userId uint64) (recipes []baseModels.Recipe
 func (u *recipeUseCase) VoteRecipe(userId, recipeId, stars uint64) (err error) {
 	return u.repository.VoteRecipe(userId, recipeId, stars)
 }
-
-func (u *recipeUseCase) GetRating(recipeId uint64) (stars float64, err error) {
-	return u.repository.GetRating(recipeId)
-}

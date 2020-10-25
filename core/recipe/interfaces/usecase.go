@@ -9,5 +9,4 @@ type RecipeUseCase interface {
 	AddToFavorites(userId, recipeId uint64) (err error)
 	GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error)
 	VoteRecipe(userId, recipeId, stars uint64) (err error)
-	GetRating(recipeId uint64) (stars float64, err error)
 }
