@@ -206,7 +206,7 @@ func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *recipeHandler) FindRecipes(w http.ResponseWriter, r *http.Request) {
-	searchString := r.FormValue("search")
+	searchString := r.FormValue("text")
 
 	recipes, err := h.useCase.FindRecipes(searchString)
 	if err != nil {

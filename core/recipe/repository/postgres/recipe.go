@@ -145,7 +145,7 @@ func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModel
 			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
 		FROM recipe re
 		LEFT JOIN rating ra ON re.id = ra.recipe_id
-		WHERE re.title LIKE lower('%' + $1 + '%')
+		WHERE re.title LIKE lower('%' || $1 || '%')
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
 	rows, err := r.db.Query(query, searchString)
 	if err != nil {
