@@ -39,7 +39,7 @@ func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
 		FROM recipe re
 		LEFT JOIN rating ra ON re.id = ra.recipe_id
-		WHERE re.id = 7
+		WHERE re.id = $1
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
 	err := r.db.QueryRow(query, id).Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
 		pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
@@ -137,4 +137,33 @@ func (r *recipeRepository) VoteRecipe(userId, recipeId, stars uint64) (rating fl
 	}
 
 	return rating, nil
+}
+
+func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModels.Recipe, err error) {
+	query := `
+		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
+			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
+		FROM recipe re
+		LEFT JOIN rating ra ON re.id = ra.recipe_id
+		WHERE re.title LIKE lower('%' + $1 + '%')
+		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
+	rows, err := r.db.Query(query, searchString)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var recipe baseModels.Recipe
+
+		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
+		if err != nil {
+			return nil, err
+		}
+
+		recipes = append(recipes, recipe)
+	}
+
+	return recipes, nil
 }
