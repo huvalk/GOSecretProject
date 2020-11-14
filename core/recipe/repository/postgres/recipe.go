@@ -159,6 +159,9 @@ func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModel
 		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
 			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				return recipes, nil
+			}
 			return nil, err
 		}
 
