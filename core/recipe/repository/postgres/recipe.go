@@ -150,7 +150,7 @@ func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModel
 	rows, err := r.db.Query(query, searchString)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return recipes, nil
+			return []baseModels.Recipe{}, nil
 		}
 		return nil, err
 	}
