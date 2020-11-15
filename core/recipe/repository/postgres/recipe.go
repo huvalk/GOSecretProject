@@ -149,6 +149,9 @@ func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModel
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
 	rows, err := r.db.Query(query, searchString)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return recipes, nil
+		}
 		return nil, err
 	}
 	defer rows.Close()
@@ -159,9 +162,6 @@ func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModel
 		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
 			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				return recipes, nil
-			}
 			return nil, err
 		}
 
