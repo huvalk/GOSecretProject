@@ -149,10 +149,6 @@ func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModel
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
 	rows, err := r.db.Query(query, searchString)
 	if err != nil {
-		golog.Info(err.Error())
-		if err == sql.ErrNoRows {
-			return []baseModels.Recipe{}, nil
-		}
 		return nil, err
 	}
 	defer rows.Close()
@@ -167,6 +163,10 @@ func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModel
 		}
 
 		recipes = append(recipes, recipe)
+	}
+
+	if len(recipes) == 0 {
+		return []baseModels.Recipe{}, nil
 	}
 
 	return recipes, nil
