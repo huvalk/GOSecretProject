@@ -56,10 +56,9 @@ func (r *AuthRepository) Logout(session string) (err error) {
 	return err
 }
 
-func (r *AuthRepository) CheckSession(session string) (err error) {
-	check := "SELECT 1 = 1 FROM session WHERE session_id = $1"
-	var result bool
-	err = r.db.QueryRow(check, session).Scan(&result)
+func (r *AuthRepository) CheckSession(session string) (userId uint64, err error) {
+	check := "SELECT user_id FROM session WHERE session_id = $1"
+	err = r.db.QueryRow(check, session).Scan(&userId)
 
-	return err
+	return userId, err
 }

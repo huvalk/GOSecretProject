@@ -20,6 +20,8 @@ func NewRecipeHandler(useCase recipeInterfaces.RecipeUseCase) *recipeHandler {
 }
 
 func (h *recipeHandler) CreateRecipe(w http.ResponseWriter, r *http.Request) {
+	authorId := r.Context().Value("userID").(uint64)
+
 	recipeByte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err.Error())
@@ -35,6 +37,7 @@ func (h *recipeHandler) CreateRecipe(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+	recipe.Author = authorId
 
 	err = h.useCase.CreateRecipe(&recipe)
 	if err != nil {
@@ -101,6 +104,8 @@ func (h *recipeHandler) GetRecipes(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *recipeHandler) AddToFavorites(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value("userID").(uint64)
+
 	recipeIdString := mux.Vars(r)["id"]
 	recipeId, err := strconv.ParseUint(recipeIdString, 10, 64)
 	if err != nil {
@@ -109,23 +114,7 @@ func (h *recipeHandler) AddToFavorites(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIdByte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-	defer r.Body.Close()
-
-	var userIdMap map[string]uint64
-	err = json.Unmarshal(userIdByte, &userIdMap)
-	if err != nil {
-		golog.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	err = h.useCase.AddToFavorites(userIdMap["id"], recipeId)
+	err = h.useCase.AddToFavorites(userId, recipeId)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -136,6 +125,8 @@ func (h *recipeHandler) AddToFavorites(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *recipeHandler) DeleteFromFavorites(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value("userID").(uint64)
+
 	recipeIdString := mux.Vars(r)["id"]
 	recipeId, err := strconv.ParseUint(recipeIdString, 10, 64)
 	if err != nil {
@@ -144,23 +135,7 @@ func (h *recipeHandler) DeleteFromFavorites(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	userIdByte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-	defer r.Body.Close()
-
-	var userIdMap map[string]uint64
-	err = json.Unmarshal(userIdByte, &userIdMap)
-	if err != nil {
-		golog.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	err = h.useCase.DeleteFromFavorites(userIdMap["id"], recipeId)
+	err = h.useCase.DeleteFromFavorites(userId, recipeId)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -171,13 +146,7 @@ func (h *recipeHandler) DeleteFromFavorites(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *recipeHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
-	userIdString := mux.Vars(r)["id"]
-	userId, err := strconv.ParseUint(userIdString, 10, 64)
-	if err != nil {
-		golog.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
+	userId := r.Context().Value("userID").(uint64)
 
 	recipes, err := h.useCase.GetFavorites(userId)
 	if err != nil {
@@ -198,6 +167,8 @@ func (h *recipeHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value("userID").(uint64)
+
 	recipeIdString := mux.Vars(r)["id"]
 	recipeId, err := strconv.ParseUint(recipeIdString, 10, 64)
 	if err != nil {
@@ -214,15 +185,16 @@ func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	var voteMap map[string]uint64
-	err = json.Unmarshal(voteByte, &voteMap)
+	var starsMap map[string]uint64
+	err = json.Unmarshal(voteByte, &starsMap)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+	stars := starsMap["stars"]
 
-	rating, err := h.useCase.VoteRecipe(voteMap["userId"], recipeId, voteMap["stars"])
+	rating, err := h.useCase.VoteRecipe(userId, recipeId, stars)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -241,10 +213,12 @@ func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *recipeHandler) FindRecipes(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value("userID").(uint64)
+
 	searchString := r.FormValue("text")
 	golog.Infof("text: %s", searchString)
 
-	recipes, err := h.useCase.FindRecipes(searchString)
+	recipes, err := h.useCase.FindRecipes(searchString, userId)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

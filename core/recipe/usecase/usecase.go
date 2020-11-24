@@ -41,6 +41,6 @@ func (u *recipeUseCase) VoteRecipe(userId, recipeId, stars uint64) (rating float
 	return u.repository.VoteRecipe(userId, recipeId, stars)
 }
 
-func (u *recipeUseCase) FindRecipes(searchString string) (recipes []baseModels.Recipe, err error) {
-	return u.repository.FindRecipes(searchString)
+func (u *recipeUseCase) FindRecipes(searchString string, userId uint64) (recipes []baseModels.Recipe, err error) {
+	return u.repository.FindRecipes(searchString, userId)
 }

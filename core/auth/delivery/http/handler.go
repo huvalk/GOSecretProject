@@ -140,7 +140,7 @@ func (h *Handler) CheckSession(w http.ResponseWriter, r *http.Request) {
 	}
 	golog.Infof("Session: %s", session)
 
-	err = h.repo.CheckSession(session.Session)
+	_, err = h.repo.CheckSession(session.Session)
 
 	if err == nil {
 		w.WriteHeader(http.StatusOK)

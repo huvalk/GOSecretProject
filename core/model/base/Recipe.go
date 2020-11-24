@@ -8,4 +8,5 @@ type Recipe struct {
 	Rating      float64  `json:"rating"`
 	Ingredients []string `json:"ingredients"`
 	Steps       []string `json:"steps"`
+	IsFavorites bool     `json:"isFavorites"`
 }

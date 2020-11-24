@@ -149,15 +149,17 @@ func (r *recipeRepository) VoteRecipe(userId, recipeId, stars uint64) (rating fl
 	return rating, nil
 }
 
-func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModels.Recipe, err error) {
+func (r *recipeRepository) FindRecipes(searchString string, userId uint64) (recipes []baseModels.Recipe, err error) {
 	query := `
 		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
-			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
+			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars,
+			COALESCE(f.user_id, 0) = $1 is_favorites
 		FROM recipe re
 		LEFT JOIN rating ra ON re.id = ra.recipe_id
-		WHERE LOWER(re.title) LIKE LOWER('%' || $1 || '%')
-		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
-	rows, err := r.db.Query(query, searchString)
+		LEFT JOIN favorites f ON re.id = f.recipe_id
+		WHERE LOWER(re.title) LIKE LOWER('%' || $2 || '%')
+		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps, f.user_id`
+	rows, err := r.db.Query(query, userId, searchString)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +169,7 @@ func (r *recipeRepository) FindRecipes(searchString string) (recipes []baseModel
 		var recipe baseModels.Recipe
 
 		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
-			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating, &recipe.IsFavorites)
 		if err != nil {
 			return nil, err
 		}
