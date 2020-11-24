@@ -59,10 +59,10 @@ func (app *App) StartRouter() {
 	router.Use(m.RecoveryMiddleware)
 	router.Use(m.LogMiddleware)
 	router.Use(m.ContentTypeMiddleware)
-	//mAuth := middleware.NewAuthMiddleware(app.authRepo)
+	mAuth := middleware.NewAuthMiddlewareHandler(app.authRepo)
 
 	authHttp.RegisterHTTPEndpoints(commonRouter, app.authRepo)
-	recipeHttp.RegisterHTTPEndpoints(commonRouter, app.recipeUseCase)
+	recipeHttp.RegisterHTTPEndpoints(commonRouter, mAuth, app.recipeUseCase)
 
 	http.Handle("/", router)
 

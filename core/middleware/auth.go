@@ -13,6 +13,10 @@ type AuthMiddlewareHandler struct {
 	authRepository authInterfaces.AuthRepository
 }
 
+func NewAuthMiddlewareHandler(authRepository authInterfaces.AuthRepository) *AuthMiddlewareHandler {
+	return &AuthMiddlewareHandler{authRepository: authRepository}
+}
+
 func (m *AuthMiddlewareHandler) UserRequired(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rID, ok := r.Context().Value("rID").(string)
