@@ -89,6 +89,16 @@ func (r *recipeRepository) AddToFavorites(userId, recipeId uint64) (err error) {
 	return nil
 }
 
+func (r *recipeRepository) DeleteFromFavorites(userId, recipeId uint64) (err error) {
+	query := "DELETE FROM favorites WHERE user_id = $1 AND recipe_id = $2"
+	_, err = r.db.Exec(query, userId, recipeId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error) {
 	query := `
 		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,

@@ -29,6 +29,10 @@ func (u *recipeUseCase) AddToFavorites(userId, recipeId uint64) (err error) {
 	return u.repository.AddToFavorites(userId, recipeId)
 }
 
+func (u *recipeUseCase) DeleteFromFavorites(userId, recipeId uint64) (err error) {
+	return u.repository.DeleteFromFavorites(userId, recipeId)
+}
+
 func (u *recipeUseCase) GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error) {
 	return u.repository.GetFavorites(userId)
 }

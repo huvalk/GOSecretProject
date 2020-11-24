@@ -135,6 +135,41 @@ func (h *recipeHandler) AddToFavorites(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (h *recipeHandler) DeleteFromFavorites(w http.ResponseWriter, r *http.Request) {
+	recipeIdString := mux.Vars(r)["id"]
+	recipeId, err := strconv.ParseUint(recipeIdString, 10, 64)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	userIdByte, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	defer r.Body.Close()
+
+	var userIdMap map[string]uint64
+	err = json.Unmarshal(userIdByte, &userIdMap)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = h.useCase.DeleteFromFavorites(userIdMap["id"], recipeId)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (h *recipeHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
 	userIdString := mux.Vars(r)["id"]
 	userId, err := strconv.ParseUint(userIdString, 10, 64)
