@@ -158,7 +158,7 @@ func (r *recipeRepository) FindRecipes(searchString string, userId uint64) (reci
 		FROM recipe re
 		LEFT JOIN rating ra ON re.id = ra.recipe_id
 		LEFT JOIN favorites f ON re.id = f.recipe_id
-		WHERE LOWER(re.title) LIKE LOWER('%' || $2 || '%')
+		WHERE LOWER(re.title) LIKE LOWER('%' || $2 || '%') AND re.user_id <> $1
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps, f.user_id`
 	rows, err := r.db.Query(query, userId, searchString)
 	if err != nil {
