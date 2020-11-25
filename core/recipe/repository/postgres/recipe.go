@@ -123,6 +123,7 @@ func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Rec
 			return nil, err
 		}
 
+		recipe.IsFavorites = true
 		recipes = append(recipes, recipe)
 	}
 
