@@ -10,5 +10,5 @@ type RecipeUseCase interface {
 	DeleteFromFavorites(userId, recipeId uint64) (err error)
 	GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error)
 	VoteRecipe(userId, recipeId, stars uint64) (rating float64, err error)
-	FindRecipes(searchString string, userId uint64) (recipes []baseModels.Recipe, err error)
+	FindRecipes(searchString string, page, userId uint64) (recipes []baseModels.Recipe, err error)
 }

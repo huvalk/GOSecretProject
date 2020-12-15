@@ -218,7 +218,13 @@ func (h *recipeHandler) FindRecipes(w http.ResponseWriter, r *http.Request) {
 	searchString := r.FormValue("text")
 	golog.Infof("text: %s", searchString)
 
-	recipes, err := h.useCase.FindRecipes(searchString, userId)
+	pageString := r.FormValue("page")
+	page, err := strconv.ParseUint(pageString, 10, 64)
+	if err != nil {
+		page = 1
+	}
+
+	recipes, err := h.useCase.FindRecipes(searchString, page, userId)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
