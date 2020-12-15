@@ -163,8 +163,8 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 		LEFT JOIN rating ra ON re.id = ra.recipe_id
 		LEFT JOIN favorites f ON re.id = f.recipe_id
 		WHERE LOWER(re.title) LIKE LOWER('%' || $2 || '%') AND re.user_id <> $1
-		ORDER BY COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) DESC
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps, f.user_id
+		ORDER BY stars DESC
 		LIMIT $3 OFFSET $4`
 	rows, err := r.db.Query(query, userId, params.Text, pageSize, offset)
 	if err != nil {
