@@ -224,14 +224,14 @@ func (h *recipeHandler) FindRecipes(w http.ResponseWriter, r *http.Request) {
 		page = 1
 	}
 
-	recipes, err := h.useCase.FindRecipes(searchString, page, userId)
+	searchResult, err := h.useCase.FindRecipes(searchString, page, userId)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
-	recipesJson, err := json.Marshal(recipes)
+	searchResultJson, err := json.Marshal(searchResult)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -239,5 +239,5 @@ func (h *recipeHandler) FindRecipes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(recipesJson)
+	_, _ = w.Write(searchResultJson)
 }
