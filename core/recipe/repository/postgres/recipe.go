@@ -152,7 +152,7 @@ func (r *recipeRepository) VoteRecipe(userId, recipeId, stars uint64) (rating fl
 	return rating, nil
 }
 
-func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId uint64) (recipes []baseModels.Recipe, err error) {
+func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId uint64) (result *baseModels.SearchResult, err error) {
 	offset := (params.Page - 1) * pageSize
 
 	query := `
@@ -166,11 +166,13 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps, f.user_id
 		ORDER BY stars DESC
 		LIMIT $3 OFFSET $4`
-	rows, err := r.db.Query(query, userId, params.Text, pageSize, offset)
+	rows, err := r.db.Query(query, userId, params.Text, pageSize + 1, offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
+	var recipes []baseModels.Recipe
 
 	for rows.Next() {
 		var recipe baseModels.Recipe
@@ -184,9 +186,15 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 		recipes = append(recipes, recipe)
 	}
 
-	if len(recipes) == 0 {
-		return []baseModels.Recipe{}, nil
+	searchResult := &baseModels.SearchResult{
+		Recipes:     recipes,
+		HasNextPage: false,
 	}
 
-	return recipes, nil
+	if len(recipes) == pageSize + 1 {
+		searchResult.Recipes = searchResult.Recipes[:pageSize]
+		searchResult.HasNextPage = true
+	}
+
+	return searchResult, nil
 }
