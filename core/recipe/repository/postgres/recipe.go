@@ -50,13 +50,13 @@ func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 
 	query := `
 		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
-			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars, re.photo
+			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
 		FROM recipe re
 		LEFT JOIN rating ra ON re.id = ra.recipe_id
 		WHERE re.id = $1
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps`
 	err := r.db.QueryRow(query, id).Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
-		pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating, &recipe.Photo)
+		pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error) {
 	query := `
 		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
-			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars, re.photo
+			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
 		FROM recipe re
 		LEFT JOIN rating ra ON re.id = ra.recipe_id
 		WHERE re.user_id = $1
@@ -82,7 +82,7 @@ func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Rec
 		var recipe baseModels.Recipe
 
 		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
-			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating, &recipe.Photo)
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
 		if err != nil {
 			return nil, err
 		}
@@ -116,7 +116,7 @@ func (r *recipeRepository) DeleteFromFavorites(userId, recipeId uint64) (err err
 func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Recipe, err error) {
 	query := `
 		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
-			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars, re.photo
+			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars
 		FROM favorites f
 		LEFT JOIN recipe re ON f.recipe_id = re.id
 		LEFT JOIN rating ra ON f.recipe_id = ra.recipe_id
@@ -132,7 +132,7 @@ func (r *recipeRepository) GetFavorites(userId uint64) (recipes []baseModels.Rec
 		var recipe baseModels.Recipe
 
 		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
-			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating, &recipe.Photo)
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating)
 		if err != nil {
 			return nil, err
 		}
@@ -170,7 +170,7 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 	query := `
 		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
 			COALESCE(SUM(ra.stars)::numeric/COUNT(ra.stars), 0) stars,
-			COALESCE(f.user_id, 0) = $1 is_favorites, re.photo
+			COALESCE(f.user_id, 0) = $1 is_favorites
 		FROM recipe re
 		LEFT JOIN rating ra ON re.id = ra.recipe_id
 		LEFT JOIN favorites f ON re.id = f.recipe_id
@@ -190,7 +190,7 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 		var recipe baseModels.Recipe
 
 		err = rows.Scan(&recipe.Id, &recipe.Author, &recipe.Title, &recipe.CookingTime,
-			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating, &recipe.IsFavorites, &recipe.Photo)
+			pq.Array(&recipe.Ingredients), pq.Array(&recipe.Steps), &recipe.Rating, &recipe.IsFavorites)
 		if err != nil {
 			return nil, err
 		}
