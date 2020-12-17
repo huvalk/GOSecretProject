@@ -68,7 +68,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	switch code {
 	case 201:
-		golog.Error("201")
+		golog.Error("Logined ", user.ID)
 		w.WriteHeader(http.StatusCreated)
 		json, _ := json.Marshal(user)
 		w.Write(json)
@@ -140,11 +140,13 @@ func (h *Handler) CheckSession(w http.ResponseWriter, r *http.Request) {
 	}
 	golog.Infof("Session: %s", session)
 
-	_, err = h.repo.CheckSession(session.Session)
+	var user baseModels.User
+	user, err = h.repo.CheckSession(session.Session)
 
 	if err == nil {
 		w.WriteHeader(http.StatusOK)
-		w.Write(empty_status_json.JsonWithStatusCode(http.StatusOK))
+		json, _ := json.Marshal(user)
+		w.Write(json)
 	} else {
 		golog.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
