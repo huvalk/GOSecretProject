@@ -40,7 +40,7 @@ func (m *AuthMiddlewareHandler) UserRequired(next http.HandlerFunc) http.Handler
 			golog.Infof("#%s: %s", rID, "success")
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), userIDKey, userID))
+		r = r.WithContext(context.WithValue(r.Context(), userIDKey, userID.ID))
 		next.ServeHTTP(w, r)
 	}
 }
