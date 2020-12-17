@@ -10,6 +10,7 @@ func RegisterHTTPEndpoints(router *mux.Router, m *middleware.AuthMiddlewareHandl
 	h := NewRecipeHandler(useCase)
 
 	router.HandleFunc("/recipe", m.UserRequired(h.CreateRecipe)).Methods("POST")
+	router.HandleFunc("/recipe/{id:[0-9]+}/photo", m.UserRequired(h.UploadPhoto)).Methods("POST")
 	router.HandleFunc("/recipe/{id:[0-9]+}", h.GetRecipe).Methods("GET")
 	router.HandleFunc("/users/{id:[0-9]+}/recipes", h.GetRecipes).Methods("GET")
 	router.HandleFunc("/favorites/{id:[0-9]+}/add", m.UserRequired(h.AddToFavorites)).Methods("POST")

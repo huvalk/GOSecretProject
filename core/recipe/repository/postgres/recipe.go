@@ -3,6 +3,7 @@ package postgres
 import (
 	baseModels "GOSecretProject/core/model/base"
 	"database/sql"
+	"errors"
 	"github.com/kataras/golog"
 	"github.com/lib/pq"
 )
@@ -17,7 +18,7 @@ func NewRecipeRepository(db *sql.DB) *recipeRepository {
 	return &recipeRepository{db: db}
 }
 
-func (r *recipeRepository) CreateRecipe(recipe *baseModels.Recipe) (err error) {
+func (r *recipeRepository) CreateRecipe(recipe *baseModels.Recipe) (recipeId uint64, err error) {
 	var id uint64
 
 	query := `
@@ -26,11 +27,22 @@ func (r *recipeRepository) CreateRecipe(recipe *baseModels.Recipe) (err error) {
 	err = r.db.QueryRow(query, &recipe.Author, &recipe.Title, &recipe.CookingTime,
 		pq.Array(recipe.Ingredients), pq.Array(&recipe.Steps)).Scan(&id)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	golog.Infof("Created recipe with id %d", id)
-	return nil
+	return id, nil
+}
+
+func (r *recipeRepository) SavePhotoLink(link string, recipeId uint64) (err error) {
+	if link == "" {
+		return errors.New("no link to save")
+	}
+
+	insertPhoto := `UPDATE recipe SET photo = $1 WHERE id = $2;`
+	_, err = r.db.Exec(insertPhoto, link, recipeId)
+
+	return err
 }
 
 func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
@@ -166,7 +178,7 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps, f.user_id
 		ORDER BY stars DESC
 		LIMIT $3 OFFSET $4`
-	rows, err := r.db.Query(query, userId, params.Text, pageSize + 1, offset)
+	rows, err := r.db.Query(query, userId, params.Text, pageSize+1, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +203,7 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 		HasNextPage: false,
 	}
 
-	if len(recipes) == pageSize + 1 {
+	if len(recipes) == pageSize+1 {
 		searchResult.Recipes = searchResult.Recipes[:pageSize]
 		searchResult.HasNextPage = true
 	}

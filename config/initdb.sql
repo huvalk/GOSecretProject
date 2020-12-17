@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS recipe (
     cooking_time INTEGER,
     ingredients TEXT[],
     steps TEXT[],
+    photo TEXT NOT NULL DEFAULT 'default',
     CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
@@ -33,6 +34,6 @@ CREATE TABLE IF NOT EXISTS favorites (
     user_id INTEGER NOT NULL,
     recipe_id INTEGER NOT NULL,
     CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES users(id),
-    CONSTRAINT recipe_fkey FOREIGN KEY (recipe_id) REFERENCES recipe(id)
+    CONSTRAINT recipe_fkey FOREIGN KEY (recipe_id) REFERENCES recipe(id),
     UNIQUE (user_id, recipe_id)
 );

@@ -9,4 +9,5 @@ type Recipe struct {
 	Ingredients []string `json:"ingredients"`
 	Steps       []string `json:"steps"`
 	IsFavorites bool     `json:"isFavorites"`
+	Photo       string   `json:"photo,omitempty"`
 }

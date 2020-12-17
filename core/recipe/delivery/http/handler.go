@@ -39,14 +39,41 @@ func (h *recipeHandler) CreateRecipe(w http.ResponseWriter, r *http.Request) {
 	}
 	recipe.Author = authorId
 
-	err = h.useCase.CreateRecipe(&recipe)
+	recipe.Id, err = h.useCase.CreateRecipe(&recipe)
 	if err != nil {
 		golog.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	golog.Error("201")
+	w.WriteHeader(http.StatusCreated)
+	json, _ := json.Marshal(recipe)
+	w.Write(json)
+}
+
+func (h *recipeHandler) UploadPhoto(w http.ResponseWriter, r *http.Request) {
+	authorId := r.Context().Value("userID").(uint64)
+	recipeId, _ := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+
+	err := r.ParseMultipartForm(1024 * 1024 * 5) //5mb
+	if err != nil {
+		golog.Errorf(err.Error())
+		w.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
+		return
+	}
+	form := r.MultipartForm
+
+	err = h.useCase.UploadPhoto(form, authorId, recipeId)
+
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	golog.Infof("#%s", "Картинка загружена")
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (h *recipeHandler) GetRecipe(w http.ResponseWriter, r *http.Request) {

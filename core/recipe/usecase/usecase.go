@@ -3,6 +3,8 @@ package usecase
 import (
 	"GOSecretProject/core/model/base"
 	"GOSecretProject/core/recipe/interfaces"
+	"GOSecretProject/core/utils/sss"
+	"mime/multipart"
 )
 
 type recipeUseCase struct {
@@ -13,8 +15,18 @@ func NewRecipeUseCase(repository recipeInterfaces.RecipeRepository) *recipeUseCa
 	return &recipeUseCase{repository: repository}
 }
 
-func (u *recipeUseCase) CreateRecipe(recipe *baseModels.Recipe) (err error) {
+func (u *recipeUseCase) CreateRecipe(recipe *baseModels.Recipe) (recipeId uint64, err error) {
 	return u.repository.CreateRecipe(recipe)
+}
+
+func (u *recipeUseCase) UploadPhoto(form *multipart.Form, authorId uint64, recipeId uint64) error {
+	// TODO дыра, проверять автора фотки
+	link, err := sss.UploadPhoto(form, recipeId)
+	if err != nil {
+		return err
+	}
+
+	return u.repository.SavePhotoLink(link, recipeId)
 }
 
 func (u *recipeUseCase) GetRecipe(id uint64) (recipe *baseModels.Recipe, err error) {
