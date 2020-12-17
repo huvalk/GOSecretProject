@@ -4,7 +4,7 @@ import (
 	"GOSecretProject/core/model/base"
 	"GOSecretProject/core/recipe/interfaces"
 	"GOSecretProject/core/utils/sss"
-	"mime/multipart"
+	"encoding/base64"
 )
 
 type recipeUseCase struct {
@@ -15,18 +15,26 @@ func NewRecipeUseCase(repository recipeInterfaces.RecipeRepository) *recipeUseCa
 	return &recipeUseCase{repository: repository}
 }
 
-func (u *recipeUseCase) CreateRecipe(recipe *baseModels.Recipe) (recipeId uint64, err error) {
-	return u.repository.CreateRecipe(recipe)
-}
-
-func (u *recipeUseCase) UploadPhoto(form *multipart.Form, authorId uint64, recipeId uint64) error {
-	// TODO дыра, проверять автора фотки
-	link, err := sss.UploadPhoto(form, recipeId)
+func (u *recipeUseCase) CreateRecipe(recipe *baseModels.Recipe) (recipeId uint64, photoPath string, err error) {
+	b64Image := recipe.Photo
+	recipe.Photo = "default"
+	recipeId, err = u.repository.CreateRecipe(recipe)
 	if err != nil {
-		return err
+		return 0, "", err
 	}
 
-	return u.repository.SavePhotoLink(link, recipeId)
+	recipe.Id = recipeId
+	unBased, err := base64.StdEncoding.DecodeString(b64Image)
+	if err != nil {
+		panic("Cannot decode b64")
+	}
+	recipe.Photo, err = sss.UploadPhoto(unBased, recipe.Id)
+	if err != nil {
+		return 0, "", err
+	}
+	err = u.repository.SavePhotoLink(recipe.Photo, recipe.Id)
+
+	return recipe.Id, recipe.Photo, err
 }
 
 func (u *recipeUseCase) GetRecipe(id uint64) (recipe *baseModels.Recipe, err error) {

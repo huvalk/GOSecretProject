@@ -2,12 +2,10 @@ package recipeInterfaces
 
 import (
 	"GOSecretProject/core/model/base"
-	"mime/multipart"
 )
 
 type RecipeUseCase interface {
-	CreateRecipe(recipe *baseModels.Recipe) (recipeId uint64, err error)
-	UploadPhoto(form *multipart.Form, authorId uint64, recipeId uint64) error
+	CreateRecipe(recipe *baseModels.Recipe) (recipeId uint64, photoPath string, err error)
 	GetRecipe(id uint64) (recipe *baseModels.Recipe, err error)
 	GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error)
 	AddToFavorites(userId, recipeId uint64) (err error)
