@@ -51,7 +51,7 @@ func (r *AuthRepository) Login(user baseModels.User) (userID int, session string
 
 func (r *AuthRepository) RestorePassword(userLogin string) (user baseModels.User, err error) {
 	checkUser := "SELECT phone, password FROM users WHERE login = $1"
-	rows := r.db.QueryRow(checkUser, user.Login)
+	rows := r.db.QueryRow(checkUser, userLogin)
 	err = rows.Scan(&user.Phone, &user.Password)
 
 	return user, err
