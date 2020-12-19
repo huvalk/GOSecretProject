@@ -93,8 +93,9 @@ func (h *Handler) RestorePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	golog.Infof("Restore: %s", user.Login)
 	user, err = h.repo.RestorePassword(user.Login)
-	golog.Infof("Restore: %s", user.Password)
+	golog.Infof("Restored: %s", user.Password)
 	//err := h.smsSender.SendSMS(user.Password, user.Phone)
 
 	if err == nil {
