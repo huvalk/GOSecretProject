@@ -199,7 +199,7 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 	}
 
 	searchResult := &baseModels.SearchResult{
-		Recipes:     recipes,
+		Recipes:     []baseModels.Recipe{},
 		HasNextPage: false,
 	}
 
