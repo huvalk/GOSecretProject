@@ -83,6 +83,31 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *Handler) RestorePassword(w http.ResponseWriter, r *http.Request) {
+	var user baseModels.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		golog.Errorf("Restore error: ", err)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusBadRequest))
+		return
+	}
+
+	golog.Infof("Restore: %s", user.Login)
+	user, err = h.repo.RestorePassword(user.Login)
+	golog.Infof("Restored: %s", user.Password)
+	//err := h.smsSender.SendSMS(user.Password, user.Phone)
+
+	if err == nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusOK))
+	} else {
+		golog.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
+	}
+}
+
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	var user baseModels.User
 	err := json.NewDecoder(r.Body).Decode(&user)
