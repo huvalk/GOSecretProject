@@ -199,13 +199,17 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 	}
 
 	searchResult := &baseModels.SearchResult{
-		Recipes:     []baseModels.Recipe{},
+		Recipes:     recipes,
 		HasNextPage: false,
 	}
 
 	if len(recipes) == pageSize+1 {
 		searchResult.Recipes = searchResult.Recipes[:pageSize]
 		searchResult.HasNextPage = true
+	}
+
+	if len(recipes) == 0 {
+		searchResult.Recipes = []baseModels.Recipe{}
 	}
 
 	return searchResult, nil
