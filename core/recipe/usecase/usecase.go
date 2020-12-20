@@ -41,6 +41,10 @@ func (u *recipeUseCase) GetRecipe(id uint64) (recipe *baseModels.Recipe, err err
 	return u.repository.GetRecipe(id)
 }
 
+func (u *recipeUseCase) DeleteRecipe(id, userId uint64) (err error) {
+	return u.repository.DeleteRecipe(id, userId)
+}
+
 func (u *recipeUseCase) GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error) {
 	return u.repository.GetRecipes(authorId)
 }

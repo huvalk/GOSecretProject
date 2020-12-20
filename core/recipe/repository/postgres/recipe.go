@@ -64,6 +64,16 @@ func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 	return &recipe, nil
 }
 
+func (r *recipeRepository) DeleteRecipe(id, userId uint64) (err error) {
+	query := "DELETE FROM recipe WHERE id = $1 AND user_id = $2"
+	_, err = r.db.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error) {
 	query := `
 		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
