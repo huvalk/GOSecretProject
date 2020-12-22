@@ -79,6 +79,27 @@ func (h *recipeHandler) GetRecipe(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(recipeJson)
 }
 
+func (h *recipeHandler) DeleteRecipe(w http.ResponseWriter, r *http.Request) {
+	authorId := r.Context().Value("userID").(uint64)
+
+	idString := mux.Vars(r)["id"]
+	id, err := strconv.ParseUint(idString, 10, 64)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = h.useCase.DeleteRecipe(id, authorId)
+	if err != nil {
+		golog.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (h *recipeHandler) GetRecipes(w http.ResponseWriter, r *http.Request) {
 	authorIdString := mux.Vars(r)["id"]
 	authorId, err := strconv.ParseUint(authorIdString, 10, 64)

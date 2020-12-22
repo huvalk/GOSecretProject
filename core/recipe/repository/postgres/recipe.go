@@ -64,6 +64,16 @@ func (r *recipeRepository) GetRecipe(id uint64) (*baseModels.Recipe, error) {
 	return &recipe, nil
 }
 
+func (r *recipeRepository) DeleteRecipe(id, userId uint64) (err error) {
+	query := "DELETE FROM recipe WHERE id = $1 AND user_id = $2"
+	_, err = r.db.Exec(query, id, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *recipeRepository) GetRecipes(authorId uint64) (recipes []baseModels.Recipe, err error) {
 	query := `
 		SELECT re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps,
@@ -176,7 +186,7 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 		LEFT JOIN favorites f ON re.id = f.recipe_id
 		WHERE LOWER(re.title) LIKE LOWER('%' || $2 || '%') AND re.user_id <> $1
 		GROUP BY re.id, re.user_id, re.title, re.cooking_time, re.ingredients, re.steps, f.user_id
-		ORDER BY stars DESC
+		ORDER BY stars DESC, title
 		LIMIT $3 OFFSET $4`
 	rows, err := r.db.Query(query, userId, params.Text, pageSize+1, offset)
 	if err != nil {
@@ -206,6 +216,10 @@ func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId ui
 	if len(recipes) == pageSize+1 {
 		searchResult.Recipes = searchResult.Recipes[:pageSize]
 		searchResult.HasNextPage = true
+	}
+
+	if len(recipes) == 0 {
+		searchResult.Recipes = []baseModels.Recipe{}
 	}
 
 	return searchResult, nil
