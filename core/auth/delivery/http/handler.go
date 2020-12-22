@@ -47,8 +47,8 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		w.Write(empty_status_json.JsonWithStatusCode(http.StatusCreated))
 	} else {
 		golog.Error(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
+		w.WriteHeader(http.StatusConflict)
+		w.Write(empty_status_json.JsonWithStatusCode(http.StatusConflict))
 	}
 }
 
@@ -139,15 +139,22 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 		w.Write(empty_status_json.JsonWithStatusCode(http.StatusBadRequest))
 	}
 
-	//code := base64.StdEncoding.EncodeToString([]byte(time.Now().String()))[:4]
-	//err := h.smsSender.SendSMS("", phone)
-	code := "2222"
-	var err error = nil
+
+	res, err := h.repo.CheckPhone(phone)
 
 	if err == nil {
-		w.WriteHeader(http.StatusOK)
-		json, _ := json.Marshal(baseModels.CodeConfirmation{Code: code})
-		w.Write(json)
+		if res {
+			w.WriteHeader(http.StatusConflict)
+			w.Write(empty_status_json.JsonWithStatusCode(http.StatusConflict))
+		} else {
+			//code := base64.StdEncoding.EncodeToString([]byte(time.Now().String()))[:4]
+			//err := h.smsSender.SendSMS("", phone)
+			code := "2222"
+			w.WriteHeader(http.StatusOK)
+			json, _ := json.Marshal(baseModels.CodeConfirmation{Code: code})
+			w.Write(json)
+		}
+
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
