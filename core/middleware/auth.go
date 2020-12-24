@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"GOSecretProject/core/auth/interfaces"
+	baseModels "GOSecretProject/core/model/base"
 	"context"
 	"github.com/kataras/golog"
 	"net/http"
@@ -34,8 +35,7 @@ func (m *AuthMiddlewareHandler) UserRequired(next http.HandlerFunc) http.Handler
 		userID, err := m.authRepository.CheckSession(session.Value)
 		if err != nil {
 			golog.Errorf("#%s: %s", rID, err.Error())
-			w.WriteHeader(http.StatusUnauthorized)
-			return
+			userID = baseModels.User{ID: 0}
 		} else {
 			golog.Infof("#%s: %s", rID, "success")
 		}

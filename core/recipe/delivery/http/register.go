@@ -17,5 +17,5 @@ func RegisterHTTPEndpoints(router *mux.Router, m *middleware.AuthMiddlewareHandl
 	router.HandleFunc("/favorites/{id:[0-9]+}/delete", m.UserRequired(h.DeleteFromFavorites)).Methods("POST")
 	router.HandleFunc("/favorites", m.UserRequired(h.GetFavorites)).Methods("GET")
 	router.HandleFunc("/recipe/{id:[0-9]+}/vote", m.UserRequired(h.VoteRecipe)).Methods("POST")
-	router.HandleFunc("/search", m.UserRequired(h.FindRecipes)).Methods("GET")
+	router.HandleFunc("/search", h.FindRecipes).Methods("GET")
 }
