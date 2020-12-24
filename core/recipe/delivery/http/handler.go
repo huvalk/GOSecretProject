@@ -21,10 +21,6 @@ func NewRecipeHandler(useCase recipeInterfaces.RecipeUseCase) *recipeHandler {
 
 func (h *recipeHandler) CreateRecipe(w http.ResponseWriter, r *http.Request) {
 	authorId := r.Context().Value("userID").(uint64)
-	if authorId == 0 {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	recipeByte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -85,10 +81,6 @@ func (h *recipeHandler) GetRecipe(w http.ResponseWriter, r *http.Request) {
 
 func (h *recipeHandler) DeleteRecipe(w http.ResponseWriter, r *http.Request) {
 	authorId := r.Context().Value("userID").(uint64)
-	if authorId == 0 {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	idString := mux.Vars(r)["id"]
 	id, err := strconv.ParseUint(idString, 10, 64)
@@ -109,13 +101,7 @@ func (h *recipeHandler) DeleteRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *recipeHandler) GetRecipes(w http.ResponseWriter, r *http.Request) {
-	authorIdString := mux.Vars(r)["id"]
-	authorId, err := strconv.ParseUint(authorIdString, 10, 64)
-	if err != nil {
-		golog.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
+	authorId := r.Context().Value("userID").(uint64)
 
 	recipes, err := h.useCase.GetRecipes(authorId)
 	if err != nil {
@@ -137,10 +123,6 @@ func (h *recipeHandler) GetRecipes(w http.ResponseWriter, r *http.Request) {
 
 func (h *recipeHandler) AddToFavorites(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value("userID").(uint64)
-	if userId == 0 {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	recipeIdString := mux.Vars(r)["id"]
 	recipeId, err := strconv.ParseUint(recipeIdString, 10, 64)
@@ -162,10 +144,6 @@ func (h *recipeHandler) AddToFavorites(w http.ResponseWriter, r *http.Request) {
 
 func (h *recipeHandler) DeleteFromFavorites(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value("userID").(uint64)
-	if userId == 0 {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	recipeIdString := mux.Vars(r)["id"]
 	recipeId, err := strconv.ParseUint(recipeIdString, 10, 64)
@@ -187,10 +165,6 @@ func (h *recipeHandler) DeleteFromFavorites(w http.ResponseWriter, r *http.Reque
 
 func (h *recipeHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value("userID").(uint64)
-	if userId == 0 {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	recipes, err := h.useCase.GetFavorites(userId)
 	if err != nil {
@@ -212,10 +186,6 @@ func (h *recipeHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
 
 func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value("userID").(uint64)
-	if userId == 0 {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	recipeIdString := mux.Vars(r)["id"]
 	recipeId, err := strconv.ParseUint(recipeIdString, 10, 64)
