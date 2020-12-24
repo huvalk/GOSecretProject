@@ -174,7 +174,7 @@ func (r *recipeRepository) VoteRecipe(userId, recipeId, stars uint64) (rating fl
 	return rating, nil
 }
 
-func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId uint64) (result *baseModels.SearchResult, err error) {
+func (r *recipeRepository) FindRecipes(params baseModels.SearchParams, userId int64) (result *baseModels.SearchResult, err error) {
 	offset := (params.Page - 1) * pageSize
 
 	query := `

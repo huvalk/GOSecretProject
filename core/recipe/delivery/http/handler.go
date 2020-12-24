@@ -231,7 +231,7 @@ func (h *recipeHandler) VoteRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *recipeHandler) FindRecipes(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value("userID").(uint64)
+	userId := r.Context().Value("userID").(int64)
 
 	searchString := r.FormValue("text")
 	golog.Infof("text: %s", searchString)
