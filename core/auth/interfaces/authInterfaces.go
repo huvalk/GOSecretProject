@@ -10,4 +10,5 @@ type AuthRepository interface {
 	RestorePassword(userLogin string) (user baseModels.User, err error)
 	Logout(session string) (err error)
 	CheckSession(session string) (user baseModels.User, err error)
+	CheckPhone(phone string) (res bool, err error)
 }
