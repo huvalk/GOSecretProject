@@ -52,19 +52,21 @@ func (m *AuthMiddlewareHandler) GetUserIfExists(next http.HandlerFunc) http.Hand
 			rID = "no request id"
 		}
 
-		var userId uint64
+		var userId int64
 
 		session, err := r.Cookie("session_id")
 		if err != nil {
 			golog.Infof("#%s: %s", rID, "No cookie")
+			userId = -1
 		} else {
 			golog.Infof("#%s: %s", rID, session.Value)
 			user, err := m.authRepository.CheckSession(session.Value)
 			if err != nil {
 				golog.Errorf("#%s: %s", rID, err.Error())
+				userId = -1
 			} else {
 				golog.Infof("#%s: %s", rID, "success")
-				userId = uint64(user.ID)
+				userId = int64(user.ID)
 			}
 		}
 
