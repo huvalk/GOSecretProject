@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"GOSecretProject/core/auth/interfaces"
-	baseModels "GOSecretProject/core/model/base"
 	"context"
 	"github.com/kataras/golog"
 	"net/http"
@@ -25,22 +24,25 @@ func (m *AuthMiddlewareHandler) UserRequired(next http.HandlerFunc) http.Handler
 			rID = "no request id"
 		}
 
+		var userId uint64
+
 		session, err := r.Cookie("session_id")
 		if err != nil {
 			golog.Infof("#%s: %s", rID, "No cookie")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		golog.Infof("#%s: %s", rID, session.Value)
-		userID, err := m.authRepository.CheckSession(session.Value)
-		if err != nil {
-			golog.Errorf("#%s: %s", rID, err.Error())
-			userID = baseModels.User{ID: 0}
+			userId = 0
 		} else {
-			golog.Infof("#%s: %s", rID, "success")
+			golog.Infof("#%s: %s", rID, session.Value)
+			user, err := m.authRepository.CheckSession(session.Value)
+			if err != nil {
+				golog.Errorf("#%s: %s", rID, err.Error())
+				userId = 0
+			} else {
+				golog.Infof("#%s: %s", rID, "success")
+				userId = uint64(user.ID)
+			}
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), userIDKey, uint64(userID.ID)))
+		r = r.WithContext(context.WithValue(r.Context(), userIDKey, userId))
 		next.ServeHTTP(w, r)
 	}
 }
