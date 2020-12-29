@@ -80,7 +80,7 @@ func (r *AuthRepository) CheckSession(session string) (user baseModels.User, err
 
 func (r *AuthRepository) CheckPhone(phone string) (res bool, err error) {
 	check := "SELECT exists(select 1 from users where phone = $1)"
-	err = r.db.QueryRow(check, phone).Scan(res)
+	err = r.db.QueryRow(check, phone).Scan(&res)
 
 	return res, err
 }
