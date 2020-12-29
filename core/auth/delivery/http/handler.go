@@ -5,10 +5,12 @@ import (
 	"GOSecretProject/core/model/base"
 	"GOSecretProject/core/utils/empty_status_json"
 	"GOSecretProject/core/utils/sms"
+	"encoding/base64"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/kataras/golog"
 	"net/http"
+	"time"
 )
 
 type Handler struct {
@@ -96,11 +98,17 @@ func (h *Handler) RestorePassword(w http.ResponseWriter, r *http.Request) {
 	golog.Infof("Restore: %s", user.Login)
 	user, err = h.repo.RestorePassword(user.Login)
 	golog.Infof("Restored: %s", user.Password)
-	//err := h.smsSender.SendSMS(user.Password, user.Phone)
 
 	if err == nil {
-		w.WriteHeader(http.StatusOK)
-		w.Write(empty_status_json.JsonWithStatusCode(http.StatusOK))
+		err = h.smsSender.SendSMS(user.Password, user.Phone)
+		if err != nil {
+			golog.Error("Sms error: ", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
+		} else {
+			w.WriteHeader(http.StatusOK)
+			w.Write(empty_status_json.JsonWithStatusCode(http.StatusOK))
+		}
 	} else {
 		golog.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -147,15 +155,20 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusConflict)
 			w.Write(empty_status_json.JsonWithStatusCode(http.StatusConflict))
 		} else {
-			//code := base64.StdEncoding.EncodeToString([]byte(time.Now().String()))[:4]
-			//err := h.smsSender.SendSMS("", phone)
-			code := "2222"
-			w.WriteHeader(http.StatusOK)
-			json, _ := json.Marshal(baseModels.CodeConfirmation{Code: code})
-			w.Write(json)
+			code := base64.StdEncoding.EncodeToString([]byte(time.Now().String()))[:4]
+			err := h.smsSender.SendSMS(code, phone)
+			if err != nil {
+				golog.Error("Sms error: ", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
+			} else {
+				w.WriteHeader(http.StatusOK)
+				json, _ := json.Marshal(baseModels.CodeConfirmation{Code: code})
+				w.Write(json)
+			}
 		}
-
 	} else {
+		golog.Error("Check error: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(empty_status_json.JsonWithStatusCode(http.StatusInternalServerError))
 	}
